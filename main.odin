@@ -6,16 +6,16 @@ import rl"vendor:raylib"
 // import la"core:math/linalg"
 
 window_Width : i32 = 1080
-window_Height : i32 = 720
+window_Height : i32 = 900
 
-Shapes :: enum {
-    I = 0,
-    L,
-    O,
-    Z,
-    T,
-}
-shapes : Shapes
+// Shapes :: enum {
+//     I = 0,
+//     L,
+//     O,
+//     Z,
+//     T,
+// }
+// shapes : Shapes
 
 customRectI : struct {
     rect1 : rl.Rectangle,
@@ -52,6 +52,21 @@ customRectT : struct {
     rect4 : rl.Rectangle,
 }
 
+// active shape (great big L to oop)
+ActiveShape : struct {
+    rect1 : ^rl.Rectangle,
+    rect2 : ^rl.Rectangle,
+    rect3 : ^rl.Rectangle,
+    rect4 : ^rl.Rectangle,
+}
+
+CollisionRects : struct {
+    rect1 : rl.Rectangle,
+    rect2 : rl.Rectangle,
+    rect3 : rl.Rectangle,
+}
+
+
 RectGrid : rl.Rectangle
 // customRect : rl.Rectangle
 
@@ -60,6 +75,7 @@ frame_counter := 0
 
 initGame :: proc () {
     rnd_num = rl.GetRandomValue(0, 4)
+    fmt.println("\n%d\n", rnd_num)
 
     RectGrid = {
         width = 30,
@@ -218,7 +234,7 @@ initGame :: proc () {
 }
 
 drawRectangleGrid :: proc() {
-    startX : f32 = 100
+    startX : f32 = 320
     startY : f32 = 100
 
     grid_width := 10
@@ -238,113 +254,79 @@ drawRectangleGrid :: proc() {
 }
 
 moveMyShape :: proc() {
-    if frame_counter % 600 == 0 {
-        customRectL.rect1.y += customRectL.rect1.height
-        customRectL.rect2.y += customRectL.rect2.height
-        customRectL.rect3.y += customRectL.rect3.height
-        customRectL.rect4.y += customRectL.rect4.height
+    // fall
+    if frame_counter % 700 == 0 {
+        ActiveShape.rect1.y += ActiveShape.rect1.height
+        ActiveShape.rect2.y += ActiveShape.rect2.height
+        ActiveShape.rect3.y += ActiveShape.rect3.height
+        ActiveShape.rect4.y += ActiveShape.rect4.height
     }
 
-    if frame_counter % 600 == 0 {
-        customRectI.rect1.y += customRectI.rect1.height
-        customRectI.rect2.y += customRectI.rect2.height
-        customRectI.rect3.y += customRectI.rect3.height
-        customRectI.rect4.y += customRectI.rect4.height
+    // movement with A & D
+    if rl.IsKeyPressed(.D) {
+        ActiveShape.rect1.x += ActiveShape.rect1.width
+        ActiveShape.rect2.x += ActiveShape.rect2.width
+        ActiveShape.rect3.x += ActiveShape.rect3.width
+        ActiveShape.rect4.x += ActiveShape.rect4.width
     }
 
-    if frame_counter % 600 == 0 {
-        customRectO.rect1.y += customRectO.rect1.height
-        customRectO.rect2.y += customRectO.rect2.height
-        customRectO.rect3.y += customRectO.rect3.height
-        customRectO.rect4.y += customRectO.rect4.height
-    }
-
-    if frame_counter % 600 == 0 {
-        customRectZ.rect1.y += customRectZ.rect1.height
-        customRectZ.rect2.y += customRectZ.rect2.height
-        customRectZ.rect3.y += customRectZ.rect3.height
-        customRectZ.rect4.y += customRectZ.rect4.height
-    }
-
-    if frame_counter % 600 == 0 {
-        customRectT.rect1.y += customRectT.rect1.height
-        customRectT.rect2.y += customRectT.rect2.height
-        customRectT.rect3.y += customRectT.rect3.height
-        customRectT.rect4.y += customRectT.rect4.height
+    if rl.IsKeyPressed(.A) {
+        ActiveShape.rect1.x -= ActiveShape.rect1.width
+        ActiveShape.rect2.x -= ActiveShape.rect2.width
+        ActiveShape.rect3.x -= ActiveShape.rect3.width
+        ActiveShape.rect4.x -= ActiveShape.rect4.width
     }
 }
 
-drawRandomShape :: proc() {
-    fmt.println("\n%d\n", rnd_num)
+drawActiveShape :: proc() {
+    rl.DrawRectangleRec(ActiveShape.rect1^, rl.SKYBLUE)
+    rl.DrawRectangleLinesEx(ActiveShape.rect1^, 2,  rl.RED)
+
+    rl.DrawRectangleRec(ActiveShape.rect2^, rl.SKYBLUE)
+    rl.DrawRectangleLinesEx(ActiveShape.rect2^, 2,  rl.RED)
+
+    rl.DrawRectangleRec(ActiveShape.rect3^, rl.SKYBLUE)
+    rl.DrawRectangleLinesEx(ActiveShape.rect3^, 2,  rl.RED)
+
+    rl.DrawRectangleRec(ActiveShape.rect4^, rl.SKYBLUE)
+    rl.DrawRectangleLinesEx(ActiveShape.rect4^, 2,  rl.RED)
+}
+
+setActiveShape :: proc() {
     switch(rnd_num) {
         case 0 : {
-            rl.DrawRectangleRec(customRectI.rect1, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectI.rect1, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectI.rect2, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectI.rect2, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectI.rect3, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectI.rect3, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectI.rect4, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectI.rect4, 2,  rl.RED)
+            ActiveShape.rect1 = &customRectI.rect1
+            ActiveShape.rect2 = &customRectI.rect2
+            ActiveShape.rect3 = &customRectI.rect3
+            ActiveShape.rect4 = &customRectI.rect4
         }
 
         case 1 : {
-            rl.DrawRectangleRec(customRectL.rect1, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectL.rect1, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectL.rect2, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectL.rect2, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectL.rect3, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectL.rect3, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectL.rect4, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectL.rect4, 2,  rl.RED)
+            ActiveShape.rect1 = &customRectL.rect1
+            ActiveShape.rect2 = &customRectL.rect2
+            ActiveShape.rect3 = &customRectL.rect3
+            ActiveShape.rect4 = &customRectL.rect4
         }
 
         case 2 : {
-            rl.DrawRectangleRec(customRectO.rect1, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectO.rect1, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectO.rect2, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectO.rect2, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectO.rect3, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectO.rect3, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectO.rect4, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectO.rect4, 2,  rl.RED)
+            ActiveShape.rect1 = &customRectO.rect1
+            ActiveShape.rect2 = &customRectO.rect2
+            ActiveShape.rect3 = &customRectO.rect3
+            ActiveShape.rect4 = &customRectO.rect4
         }
 
         case 3 : {
-            rl.DrawRectangleRec(customRectZ.rect1, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectZ.rect1, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectZ.rect2, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectZ.rect2, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectZ.rect3, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectZ.rect3, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectZ.rect4, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectZ.rect4, 2,  rl.RED)
+            ActiveShape.rect1 = &customRectZ.rect1
+            ActiveShape.rect2 = &customRectZ.rect2
+            ActiveShape.rect3 = &customRectZ.rect3
+            ActiveShape.rect4 = &customRectZ.rect4
         }
 
         case 4 : {
-            rl.DrawRectangleRec(customRectT.rect1, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectT.rect1, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectT.rect2, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectT.rect2, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectT.rect3, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectT.rect3, 2,  rl.RED)
-
-            rl.DrawRectangleRec(customRectT.rect4, rl.SKYBLUE)
-            rl.DrawRectangleLinesEx(customRectT.rect4, 2,  rl.RED)
+            ActiveShape.rect1 = &customRectT.rect1
+            ActiveShape.rect2 = &customRectT.rect2
+            ActiveShape.rect3 = &customRectT.rect3
+            ActiveShape.rect4 = &customRectT.rect4
         }
     }
 }
@@ -356,7 +338,8 @@ drawUpdateFrame :: proc() {
     drawRectangleGrid()
     moveMyShape()
 
-    drawRandomShape()
+    setActiveShape()
+    drawActiveShape()
 
     rl.EndDrawing()
 }
