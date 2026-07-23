@@ -17,6 +17,7 @@ window_Height : i32 = 900
 // }
 // shapes : Shapes
 
+// custom shapes
 customRectI : struct {
     rect1 : rl.Rectangle,
     rect2 : rl.Rectangle,
@@ -52,7 +53,7 @@ customRectT : struct {
     rect4 : rl.Rectangle,
 }
 
-// active shape (great big L to oop)
+// active shapes
 ActiveShape : struct {
     rect1 : ^rl.Rectangle,
     rect2 : ^rl.Rectangle,
@@ -60,10 +61,11 @@ ActiveShape : struct {
     rect4 : ^rl.Rectangle,
 }
 
+// collision rects
 CollisionRects : struct {
     rect1 : rl.Rectangle,
-    rect2 : rl.Rectangle,
-    rect3 : rl.Rectangle,
+    // rect2 : rl.Rectangle,
+    // rect3 : rl.Rectangle,
 }
 
 
@@ -74,162 +76,184 @@ rnd_num : i32
 frame_counter := 0
 
 initGame :: proc () {
-    rnd_num = rl.GetRandomValue(0, 4)
-    fmt.println("\n%d\n", rnd_num)
-
     RectGrid = {
         width = 30,
         height = 30,
     }
 
-    customRectI = {
+    CollisionRects = {
         rect1 = {
-            x = 500,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
-
-        rect2 = {
-            x = 500,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
-
-        rect3 = {
-            x = 500,
-            y = 100 + (2 * 30),
-            width = 30,
-            height = 30,
-        },
-
-        rect4 = {
-            x = 500,
-            y = 100 + (3 * 30),
-            width = 30,
-            height = 30,
-        },
+            x = 300,
+            y = 700,
+            width = 350,
+            height = 20,
+        }
     }
+}
 
-    customRectL = {
-        rect1 = {
-            x = 500,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+initShape :: proc() {
+    rnd_num = rl.GetRandomValue(0, 4)
 
-        rect2 = {
-            x = 500,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
+    switch(rnd_num) {
+        case 0 : {
+            customRectI = {
+                rect1 = {
+                    x = 500,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect3 = {
-            x = 500,
-            y = 100 + (2 * 30),
-            width = 30,
-            height = 30,
-        },
+                rect2 = {
+                    x = 500,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect4 = {
-            x = 500 + 30,
-            y = 100 + (2 * 30),
-            width = 30,
-            height = 30,
-        },
-    }
+                rect3 = {
+                    x = 500,
+                    y = 100 + (2 * 30),
+                    width = 30,
+                    height = 30,
+                },
 
-    customRectO = {
-        rect1 = {
-            x = 500,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+                rect4 = {
+                    x = 500,
+                    y = 100 + (3 * 30),
+                    width = 30,
+                    height = 30,
+                },
+            }
+        }
 
-        rect2 = {
-            x = 500,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
+        case 1 : {
+            customRectL = {
+                rect1 = {
+                    x = 500,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect3 = {
-            x = 500 + 30,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+                rect2 = {
+                    x = 500,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect4 = {
-            x = 500 + 30,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
-    }
+                rect3 = {
+                    x = 500,
+                    y = 100 + (2 * 30),
+                    width = 30,
+                    height = 30,
+                },
 
-    customRectZ = {
-        rect1 = {
-            x = 500,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+                rect4 = {
+                    x = 500 + 30,
+                    y = 100 + (2 * 30),
+                    width = 30,
+                    height = 30,
+                },
+            }
+        }
 
-        rect2 = {
-            x = 500 + 30,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+        case 2 : {
+            customRectO = {
+                rect1 = {
+                    x = 500,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect3 = {
-            x = 500 + 30,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
+                rect2 = {
+                    x = 500,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect4 = {
-            x = 500 + (30 * 2),
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
-    }
+                rect3 = {
+                    x = 500 + 30,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-    customRectT = {
-        rect1 = {
-            x = 500,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+                rect4 = {
+                    x = 500 + 30,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
+            }
+        }
 
-        rect2 = {
-            x = 500 + 30,
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+        case 3 : {
+            customRectZ = {
+                rect1 = {
+                    x = 500,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect3 = {
-            x = 500 + (2 * 30),
-            y = 100,
-            width = 30,
-            height = 30,
-        },
+                rect2 = {
+                    x = 500 + 30,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
 
-        rect4 = {
-            x = 500 + 30,
-            y = 100 + 30,
-            width = 30,
-            height = 30,
-        },
+                rect3 = {
+                    x = 500 + 30,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
+
+                rect4 = {
+                    x = 500 + (30 * 2),
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
+            }
+        }
+        case 4 : {
+            customRectT = {
+                rect1 = {
+                    x = 500,
+                    y = 100,
+                    width = 30,
+
+                    height = 30,
+                },
+
+                rect2 = {
+                    x = 500 + 30,
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
+
+                rect3 = {
+                    x = 500 + (2 * 30),
+                    y = 100,
+                    width = 30,
+                    height = 30,
+                },
+
+                rect4 = {
+                    x = 500 + 30,
+                    y = 100 + 30,
+                    width = 30,
+                    height = 30,
+                },
+            }
+        }
     }
 }
 
@@ -255,27 +279,32 @@ drawRectangleGrid :: proc() {
 
 moveMyShape :: proc() {
     // fall
-    if frame_counter % 700 == 0 {
-        ActiveShape.rect1.y += ActiveShape.rect1.height
-        ActiveShape.rect2.y += ActiveShape.rect2.height
-        ActiveShape.rect3.y += ActiveShape.rect3.height
-        ActiveShape.rect4.y += ActiveShape.rect4.height
+    collision := rl.CheckCollisionRecs(ActiveShape.rect4^, CollisionRects.rect1)
+    if !collision {
+        if frame_counter % 300 == 0 {
+            ActiveShape.rect1^.y += ActiveShape.rect1^.height
+            ActiveShape.rect2^.y += ActiveShape.rect2^.height
+            ActiveShape.rect3^.y += ActiveShape.rect3^.height
+            ActiveShape.rect4^.y += ActiveShape.rect4^.height
+        }
+        // movement with A & D
+        if rl.IsKeyPressed(.D) {
+            ActiveShape.rect1.x += ActiveShape.rect1.width
+            ActiveShape.rect2.x += ActiveShape.rect2.width
+            ActiveShape.rect3.x += ActiveShape.rect3.width
+            ActiveShape.rect4.x += ActiveShape.rect4.width
+        }
+
+        if rl.IsKeyPressed(.A) {
+            ActiveShape.rect1.x -= ActiveShape.rect1.width
+            ActiveShape.rect2.x -= ActiveShape.rect2.width
+            ActiveShape.rect3.x -= ActiveShape.rect3.width
+            ActiveShape.rect4.x -= ActiveShape.rect4.width
+        }
+    } else {
+        initShape();
     }
 
-    // movement with A & D
-    if rl.IsKeyPressed(.D) {
-        ActiveShape.rect1.x += ActiveShape.rect1.width
-        ActiveShape.rect2.x += ActiveShape.rect2.width
-        ActiveShape.rect3.x += ActiveShape.rect3.width
-        ActiveShape.rect4.x += ActiveShape.rect4.width
-    }
-
-    if rl.IsKeyPressed(.A) {
-        ActiveShape.rect1.x -= ActiveShape.rect1.width
-        ActiveShape.rect2.x -= ActiveShape.rect2.width
-        ActiveShape.rect3.x -= ActiveShape.rect3.width
-        ActiveShape.rect4.x -= ActiveShape.rect4.width
-    }
 }
 
 drawActiveShape :: proc() {
@@ -336,10 +365,13 @@ drawUpdateFrame :: proc() {
     rl.ClearBackground(rl.RAYWHITE)
 
     drawRectangleGrid()
-    moveMyShape()
 
     setActiveShape()
     drawActiveShape()
+
+    moveMyShape()
+
+    rl.DrawRectangleRec(CollisionRects.rect1, rl.BLACK);
 
     rl.EndDrawing()
 }
@@ -349,6 +381,7 @@ main :: proc() {
     defer rl.CloseWindow()
 
     initGame();
+    initShape();
 
     for !rl.WindowShouldClose() {
         frame_counter += 1
