@@ -68,9 +68,32 @@ CollisionRects : struct {
     // rect3 : rl.Rectangle,
 }
 
+ActiveShapeGridPos : struct {
+    rect1_pos : [2]i32,
+    rect2_pos : [2]i32,
+    rect3_pos : [2]i32,
+    rect4_pos : [2]i32,
+}
 
+FinalShapeGridPos : struct {
+    rect1_pos : [2]i32,
+    rect2_pos : [2]i32,
+    rect3_pos : [2]i32,
+    rect4_pos : [2]i32,
+}
+
+GRID_HEIGHT :: 20
+GRID_WIDTH :: 10
+
+Grid :: struct {
+    grid_rects : rl.Rectangle,
+    empty : bool,
+}
+
+GridRect : [GRID_HEIGHT][GRID_WIDTH]Grid
+
+gameIsOver := false
 RectGrid : rl.Rectangle
-// customRect : rl.Rectangle
 
 rnd_num : i32
 frame_counter := 0
@@ -89,6 +112,9 @@ initGame :: proc () {
             height = 20,
         }
     }
+
+    // fmt.println(GridRect[0][0].grid_rects.height)
+    // fmt.println(GridRect[0][0].grid_rects.width)
 }
 
 initShape :: proc() {
@@ -96,6 +122,18 @@ initShape :: proc() {
 
     switch(rnd_num) {
         case 0 : {
+            ActiveShapeGridPos.rect1_pos.x = 0
+            ActiveShapeGridPos.rect1_pos.y = 6
+
+            ActiveShapeGridPos.rect2_pos.x = 1
+            ActiveShapeGridPos.rect2_pos.y = 6
+
+            ActiveShapeGridPos.rect3_pos.x = 2
+            ActiveShapeGridPos.rect3_pos.y = 6
+
+            ActiveShapeGridPos.rect4_pos.x = 3
+            ActiveShapeGridPos.rect4_pos.y = 6
+
             customRectI = {
                 rect1 = {
                     x = 500,
@@ -128,6 +166,18 @@ initShape :: proc() {
         }
 
         case 1 : {
+            ActiveShapeGridPos.rect1_pos.x = 0
+            ActiveShapeGridPos.rect1_pos.y = 6
+
+            ActiveShapeGridPos.rect2_pos.x = 1
+            ActiveShapeGridPos.rect2_pos.y = 6
+
+            ActiveShapeGridPos.rect3_pos.x = 2
+            ActiveShapeGridPos.rect3_pos.y = 6
+
+            ActiveShapeGridPos.rect4_pos.x = 2
+            ActiveShapeGridPos.rect4_pos.y = 7
+
             customRectL = {
                 rect1 = {
                     x = 500,
@@ -160,6 +210,18 @@ initShape :: proc() {
         }
 
         case 2 : {
+            ActiveShapeGridPos.rect1_pos.x = 0
+            ActiveShapeGridPos.rect1_pos.y = 6
+
+            ActiveShapeGridPos.rect2_pos.x = 0
+            ActiveShapeGridPos.rect2_pos.y = 7
+
+            ActiveShapeGridPos.rect3_pos.x = 1
+            ActiveShapeGridPos.rect3_pos.y = 6
+
+            ActiveShapeGridPos.rect4_pos.x = 1
+            ActiveShapeGridPos.rect4_pos.y = 7
+
             customRectO = {
                 rect1 = {
                     x = 500,
@@ -192,6 +254,18 @@ initShape :: proc() {
         }
 
         case 3 : {
+            ActiveShapeGridPos.rect1_pos.x = 0
+            ActiveShapeGridPos.rect1_pos.y = 6
+
+            ActiveShapeGridPos.rect2_pos.x = 0
+            ActiveShapeGridPos.rect2_pos.y = 7
+
+            ActiveShapeGridPos.rect3_pos.x = 1
+            ActiveShapeGridPos.rect3_pos.y = 7
+
+            ActiveShapeGridPos.rect4_pos.x = 1
+            ActiveShapeGridPos.rect4_pos.y = 8
+
             customRectZ = {
                 rect1 = {
                     x = 500,
@@ -223,6 +297,18 @@ initShape :: proc() {
             }
         }
         case 4 : {
+            ActiveShapeGridPos.rect1_pos.x = 0
+            ActiveShapeGridPos.rect1_pos.y = 6
+
+            ActiveShapeGridPos.rect2_pos.x = 0
+            ActiveShapeGridPos.rect2_pos.y = 7
+
+            ActiveShapeGridPos.rect3_pos.x = 0
+            ActiveShapeGridPos.rect3_pos.y = 8
+
+            ActiveShapeGridPos.rect4_pos.x = 1
+            ActiveShapeGridPos.rect4_pos.y = 7
+
             customRectT = {
                 rect1 = {
                     x = 500,
@@ -257,19 +343,21 @@ initShape :: proc() {
     }
 }
 
-drawRectangleGrid :: proc() {
+drawGrid :: proc() {
     startX : f32 = 320
     startY : f32 = 100
 
-    grid_width := 10
-    grid_height := 20
-
     RectGrid.y = startY
-    for i := 0; i < grid_height; i += 1 {
+    for i := 0; i < GRID_HEIGHT; i += 1 {
         RectGrid.x = startX
-        for j := 0; j < grid_width; j += 1 {
+        for j := 0; j < GRID_WIDTH; j += 1 {
             rl.DrawRectangleLinesEx(RectGrid, 1, rl.RED)
             RectGrid.x += RectGrid.width
+
+            if !GridRect[i][j].empty {
+                rl.DrawRectangleRec(GridRect[i][j].grid_rects, rl.BLUE)
+            }
+
             // fmt.printf("\nrect.x: %d\n", rect.x)
         }
         RectGrid.y += RectGrid.height
@@ -277,15 +365,74 @@ drawRectangleGrid :: proc() {
     }
 }
 
-moveMyShape :: proc() {
+// drawShapeRectangleGrid :: proc() {
+//     startX : f32 = 100
+//     startY : f32 = 100
+//
+//     grid_width := 10
+//     grid_height := 20
+//
+//     RectGrid.y = startY
+//     for i := 0; i < grid_height; i += 1 {
+//         RectGrid.x = startX
+//         for j := 0; j < grid_width; j += 1 {
+//             rl.DrawRectangleLinesEx(RectGrid, 1, rl.RED)
+//             RectGrid.x += RectGrid.width
+//             // fmt.printf("\nrect.x: %d\n", rect.x)
+//         }
+//         RectGrid.y += RectGrid.height
+//         // fmt.printf("\nrect.y: %d\n", rect.y)
+//     }
+// }
+
+initGrid:: proc() {
+    GridRect[FinalShapeGridPos.rect1_pos.x][FinalShapeGridPos.rect1_pos.y].grid_rects = {
+        x = ActiveShape.rect1.x,
+        y = ActiveShape.rect1.y,
+        width = ActiveShape.rect1.width,
+        height = ActiveShape.rect1.height,
+    }
+    GridRect[FinalShapeGridPos.rect1_pos.x][FinalShapeGridPos.rect1_pos.y].empty = false
+
+    GridRect[FinalShapeGridPos.rect2_pos.x][FinalShapeGridPos.rect2_pos.y].grid_rects = {
+        x = ActiveShape.rect2.x,
+        y = ActiveShape.rect2.y,
+        width = ActiveShape.rect2.width,
+        height = ActiveShape.rect2.height,
+    }
+    GridRect[FinalShapeGridPos.rect2_pos.x][FinalShapeGridPos.rect2_pos.y].empty = false
+
+    GridRect[FinalShapeGridPos.rect3_pos.x][FinalShapeGridPos.rect3_pos.y].grid_rects = {
+        x = ActiveShape.rect3.x,
+        y = ActiveShape.rect3.y,
+        width = ActiveShape.rect3.width,
+        height = ActiveShape.rect3.height,
+    }
+    GridRect[FinalShapeGridPos.rect3_pos.x][FinalShapeGridPos.rect3_pos.y].empty = false
+
+    GridRect[FinalShapeGridPos.rect4_pos.x][FinalShapeGridPos.rect4_pos.y].grid_rects = {
+        x = ActiveShape.rect4.x,
+        y = ActiveShape.rect4.y,
+        width = ActiveShape.rect4.width,
+        height = ActiveShape.rect4.height,
+    }
+    GridRect[FinalShapeGridPos.rect4_pos.x][FinalShapeGridPos.rect4_pos.y].empty = false
+}
+
+moveAndSetShape :: proc() {
     // fall
     collision := rl.CheckCollisionRecs(ActiveShape.rect4^, CollisionRects.rect1)
     if !collision {
-        if frame_counter % 300 == 0 {
+        if frame_counter % 100 == 0 {
             ActiveShape.rect1^.y += ActiveShape.rect1^.height
             ActiveShape.rect2^.y += ActiveShape.rect2^.height
             ActiveShape.rect3^.y += ActiveShape.rect3^.height
             ActiveShape.rect4^.y += ActiveShape.rect4^.height
+
+            ActiveShapeGridPos.rect1_pos.x += 1
+            ActiveShapeGridPos.rect2_pos.x += 1
+            ActiveShapeGridPos.rect3_pos.x += 1
+            ActiveShapeGridPos.rect4_pos.x += 1
         }
         // movement with A & D
         if rl.IsKeyPressed(.D) {
@@ -293,6 +440,11 @@ moveMyShape :: proc() {
             ActiveShape.rect2.x += ActiveShape.rect2.width
             ActiveShape.rect3.x += ActiveShape.rect3.width
             ActiveShape.rect4.x += ActiveShape.rect4.width
+
+            ActiveShapeGridPos.rect1_pos.y += 1
+            ActiveShapeGridPos.rect2_pos.y += 1
+            ActiveShapeGridPos.rect3_pos.y += 1
+            ActiveShapeGridPos.rect4_pos.y += 1
         }
 
         if rl.IsKeyPressed(.A) {
@@ -300,11 +452,33 @@ moveMyShape :: proc() {
             ActiveShape.rect2.x -= ActiveShape.rect2.width
             ActiveShape.rect3.x -= ActiveShape.rect3.width
             ActiveShape.rect4.x -= ActiveShape.rect4.width
+
+            ActiveShapeGridPos.rect1_pos.y -= 1
+            ActiveShapeGridPos.rect2_pos.y -= 1
+            ActiveShapeGridPos.rect3_pos.y -= 1
+            ActiveShapeGridPos.rect4_pos.y -= 1
         }
     } else {
-        initShape();
-    }
+        ActiveShape.rect1.y -= ActiveShape.rect1.width
+        ActiveShape.rect2.y -= ActiveShape.rect2.width
+        ActiveShape.rect3.y -= ActiveShape.rect3.width
+        ActiveShape.rect4.y -= ActiveShape.rect4.width
 
+        ActiveShapeGridPos.rect1_pos.x -= 1
+        ActiveShapeGridPos.rect2_pos.x -= 1
+        ActiveShapeGridPos.rect3_pos.x -= 1
+        ActiveShapeGridPos.rect4_pos.x -= 1
+
+        FinalShapeGridPos = ActiveShapeGridPos
+
+        fmt.println("x: %d", FinalShapeGridPos.rect4_pos.x)
+        fmt.println("y: %d", FinalShapeGridPos.rect4_pos.y)
+
+        initGrid();
+
+        initShape();
+        setActiveShape()
+    }
 }
 
 drawActiveShape :: proc() {
@@ -364,14 +538,15 @@ drawUpdateFrame :: proc() {
     rl.BeginDrawing()
     rl.ClearBackground(rl.RAYWHITE)
 
-    drawRectangleGrid()
+    if !gameIsOver {
+        drawGrid()
 
-    setActiveShape()
-    drawActiveShape()
+        drawActiveShape()
 
-    moveMyShape()
+        moveAndSetShape()
 
-    rl.DrawRectangleRec(CollisionRects.rect1, rl.BLACK);
+        rl.DrawRectangleRec(CollisionRects.rect1, rl.BLACK);
+    }
 
     rl.EndDrawing()
 }
@@ -381,7 +556,10 @@ main :: proc() {
     defer rl.CloseWindow()
 
     initGame();
+
+    // initial initialization of the shape
     initShape();
+    setActiveShape()
 
     for !rl.WindowShouldClose() {
         frame_counter += 1
