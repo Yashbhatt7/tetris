@@ -1,7 +1,6 @@
 package game
 
 import "core:fmt"
-
 import rl"vendor:raylib"
 // import la"core:math/linalg"
 
@@ -354,9 +353,10 @@ drawGrid :: proc() {
             rl.DrawRectangleLinesEx(RectGrid, 1, rl.RED)
             RectGrid.x += RectGrid.width
 
-            if !GridRect[i][j].empty {
+            // if GridRect[i][j].empty {
+                // fmt.println("empty?")
                 rl.DrawRectangleRec(GridRect[i][j].grid_rects, rl.BLUE)
-            }
+            // }
 
             // fmt.printf("\nrect.x: %d\n", rect.x)
         }
@@ -392,7 +392,7 @@ initGrid:: proc() {
         width = ActiveShape.rect1.width,
         height = ActiveShape.rect1.height,
     }
-    GridRect[FinalShapeGridPos.rect1_pos.x][FinalShapeGridPos.rect1_pos.y].empty = false
+    // GridRect[FinalShapeGridPos.rect1_pos.x][FinalShapeGridPos.rect1_pos.y].empty = true
 
     GridRect[FinalShapeGridPos.rect2_pos.x][FinalShapeGridPos.rect2_pos.y].grid_rects = {
         x = ActiveShape.rect2.x,
@@ -400,7 +400,7 @@ initGrid:: proc() {
         width = ActiveShape.rect2.width,
         height = ActiveShape.rect2.height,
     }
-    GridRect[FinalShapeGridPos.rect2_pos.x][FinalShapeGridPos.rect2_pos.y].empty = false
+    // GridRect[FinalShapeGridPos.rect2_pos.x][FinalShapeGridPos.rect2_pos.y].empty = true
 
     GridRect[FinalShapeGridPos.rect3_pos.x][FinalShapeGridPos.rect3_pos.y].grid_rects = {
         x = ActiveShape.rect3.x,
@@ -408,7 +408,7 @@ initGrid:: proc() {
         width = ActiveShape.rect3.width,
         height = ActiveShape.rect3.height,
     }
-    GridRect[FinalShapeGridPos.rect3_pos.x][FinalShapeGridPos.rect3_pos.y].empty = false
+    // GridRect[FinalShapeGridPos.rect3_pos.x][FinalShapeGridPos.rect3_pos.y].empty = true
 
     GridRect[FinalShapeGridPos.rect4_pos.x][FinalShapeGridPos.rect4_pos.y].grid_rects = {
         x = ActiveShape.rect4.x,
@@ -416,13 +416,93 @@ initGrid:: proc() {
         width = ActiveShape.rect4.width,
         height = ActiveShape.rect4.height,
     }
-    GridRect[FinalShapeGridPos.rect4_pos.x][FinalShapeGridPos.rect4_pos.y].empty = false
+    // GridRect[FinalShapeGridPos.rect4_pos.x][FinalShapeGridPos.rect4_pos.y].empty = true
 }
+
+checkGridRectCollisions :: proc() {
+    for i := 0; i < GRID_HEIGHT; i += 1 {
+        for j := 0; j < GRID_WIDTH; j += 1 {
+            collision1 := rl.CheckCollisionRecs(ActiveShape.rect1^, GridRect[i][j].grid_rects)
+            collision2 := rl.CheckCollisionRecs(ActiveShape.rect2^, GridRect[i][j].grid_rects)
+            collision3 := rl.CheckCollisionRecs(ActiveShape.rect3^, GridRect[i][j].grid_rects)
+            collision4 := rl.CheckCollisionRecs(ActiveShape.rect4^, GridRect[i][j].grid_rects)
+
+            if collision1 || collision2 || collision3 || collision4 {
+                ActiveShape.rect1.y -= ActiveShape.rect1.width
+                ActiveShape.rect2.y -= ActiveShape.rect2.width
+                ActiveShape.rect3.y -= ActiveShape.rect3.width
+                ActiveShape.rect4.y -= ActiveShape.rect4.width
+
+                ActiveShapeGridPos.rect1_pos.x -= 1
+                ActiveShapeGridPos.rect2_pos.x -= 1
+                ActiveShapeGridPos.rect3_pos.x -= 1
+                ActiveShapeGridPos.rect4_pos.x -= 1
+
+                FinalShapeGridPos = ActiveShapeGridPos
+
+                initGrid();
+                // ClearHzLine();
+
+                initShape();
+                setActiveShape()
+            }
+        }
+    }
+}
+
+// ClearHzLine :: proc() {
+//     checkHrLine := true
+//     for i := 0; i < GRID_WIDTH; i += 1 {
+//         if GridRect[FinalShapeGridPos.rect1_pos.x][i].grid_rects.width == 0 {
+//             checkHrLine = false
+//         }
+//     }
+//
+//     if checkHrLine == true {
+//
+//     }
+//
+//     for i := 0; i < GRID_WIDTH; i += 1 {
+//
+//     }
+//
+//     for i := 0; i < GRID_WIDTH; i += 1 {
+//
+//     }
+//
+//     for i := 0; i < GRID_WIDTH; i += 1 {
+//
+//     }
+// }
+
+collision1 : bool
 
 moveAndSetShape :: proc() {
     // fall
-    collision := rl.CheckCollisionRecs(ActiveShape.rect4^, CollisionRects.rect1)
-    if !collision {
+    collision1 = rl.CheckCollisionRecs(ActiveShape.rect4^, CollisionRects.rect1)
+
+    if collision1 {
+        ActiveShape.rect1.y -= ActiveShape.rect1.width
+        ActiveShape.rect2.y -= ActiveShape.rect2.width
+        ActiveShape.rect3.y -= ActiveShape.rect3.width
+        ActiveShape.rect4.y -= ActiveShape.rect4.width
+
+        ActiveShapeGridPos.rect1_pos.x -= 1
+        ActiveShapeGridPos.rect2_pos.x -= 1
+        ActiveShapeGridPos.rect3_pos.x -= 1
+        ActiveShapeGridPos.rect4_pos.x -= 1
+
+        FinalShapeGridPos = ActiveShapeGridPos
+
+        fmt.println("x: %d", FinalShapeGridPos.rect4_pos.x)
+        fmt.println("y: %d", FinalShapeGridPos.rect4_pos.y)
+
+        initGrid();
+        // ClearHzLine();
+
+        initShape();
+        setActiveShape()
+    } else {
         if frame_counter % 100 == 0 {
             ActiveShape.rect1^.y += ActiveShape.rect1^.height
             ActiveShape.rect2^.y += ActiveShape.rect2^.height
@@ -458,27 +538,8 @@ moveAndSetShape :: proc() {
             ActiveShapeGridPos.rect3_pos.y -= 1
             ActiveShapeGridPos.rect4_pos.y -= 1
         }
-    } else {
-        ActiveShape.rect1.y -= ActiveShape.rect1.width
-        ActiveShape.rect2.y -= ActiveShape.rect2.width
-        ActiveShape.rect3.y -= ActiveShape.rect3.width
-        ActiveShape.rect4.y -= ActiveShape.rect4.width
-
-        ActiveShapeGridPos.rect1_pos.x -= 1
-        ActiveShapeGridPos.rect2_pos.x -= 1
-        ActiveShapeGridPos.rect3_pos.x -= 1
-        ActiveShapeGridPos.rect4_pos.x -= 1
-
-        FinalShapeGridPos = ActiveShapeGridPos
-
-        fmt.println("x: %d", FinalShapeGridPos.rect4_pos.x)
-        fmt.println("y: %d", FinalShapeGridPos.rect4_pos.y)
-
-        initGrid();
-
-        initShape();
-        setActiveShape()
     }
+    checkGridRectCollisions()
 }
 
 drawActiveShape :: proc() {
